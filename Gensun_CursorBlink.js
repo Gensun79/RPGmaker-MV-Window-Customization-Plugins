@@ -28,7 +28,7 @@ Gensun.Cursor = Gensun.Cursor || {};
 
   (function() {
 	  
-let param = PluginManager.parameters('Gensun_Cursor');
+let param = PluginManager.parameters('Gensun_CursorBlink');
 Gensun.Cursor._duration = Number(param["Frames per cycle"]);
 Gensun.Cursor._opacityPeak = Number(param["Peak Opacity"]);
 Gensun.Cursor._opacityBase = Number(param["Base Opacity"]);
