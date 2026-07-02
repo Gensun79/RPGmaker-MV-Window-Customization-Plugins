@@ -1,6 +1,6 @@
 
 /*:
- * @plugindesc Allows some customization to cursor background easing
+ * @plugindesc Allows customization for the cursor's blinking animation
  * @author Gensun
  *
  * @param Frames per cycle
@@ -18,9 +18,14 @@
  * @desc 1: Linear, 2: Quadratic, 3: Cubic, 4: Quartic. Fractional powers are allowed.
  * @default 3
  *
+ * @param Rounding
+ * @desc Rounds the cursor opacity to the nearest nth. Set to 1 for cursor either fully opaque or invisible. Set to 0 to disable
+ * @default 0
+ *
  * @help
  * ============================== Version History ===============================
- * - v1.0   Jun 23 2026:	Public release
+ * - v1.1	Jul 02 2026:	Opacity values may now be rounded
+ * - v1.0   Jun 23 2026:	Plugin finished
  */
  
 var Gensun = Gensun || {};
@@ -32,6 +37,7 @@ let param = PluginManager.parameters('Gensun_CursorBlink');
 Gensun.Cursor._duration = Number(param["Frames per cycle"]);
 Gensun.Cursor._opacityPeak = Number(param["Peak Opacity"]);
 Gensun.Cursor._opacityBase = Number(param["Base Opacity"]);
+Gensun.Cursor._rounding = Number(param["Rounding"]);
 Gensun.Cursor._opacityDifferential = Gensun.Cursor._opacityPeak - Gensun.Cursor._opacityBase;
 
 Gensun.Cursor.power = (function(power) {
@@ -49,6 +55,17 @@ Window.prototype.cursorOpacity = function() {
 	blinkPhase = 2 * Math.abs(Gensun.Cursor._duration/2 - blinkPhase) / Gensun.Cursor._duration;
 	return Gensun.Cursor._opacityBase + Gensun.Cursor.power(blinkPhase) * Gensun.Cursor._opacityDifferential;
 };
+
+if (Gensun.Cursor._rounding > 0) {
+	
+	const opacityFactor = 1 / Gensun.Cursor._rounding;
+	Gensun.Cursor.cursorOpacity = Window.prototype.cursorOpacity;
+	Window.prototype.cursorOpacity = function() {
+		var opacity = Gensun.Cursor.cursorOpacity.call(this);
+		return Math.round(opacity * opacityFactor) * Gensun.Cursor._rounding;
+	};
+	
+}
 	  
 Window.prototype._updateCursor = function() {
     var cursorOpacity = this.contentsOpacity;
