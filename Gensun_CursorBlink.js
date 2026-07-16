@@ -1,6 +1,6 @@
 
 /*:
- * @plugindesc Allows customization for the cursor's blinking animation
+ * @plugindesc [MV] Allows customization for the cursor's blinking animation
  * @author Gensun
  *
  * @param Frames per cycle
@@ -24,6 +24,7 @@
  *
  * @help
  * ============================== Version History ===============================
+ * - v1.1.1 Jul 15 2026:	Minor Edits
  * - v1.1	Jul 02 2026:	Opacity values may now be rounded
  * - v1.0   Jun 23 2026:	Plugin finished
  */
@@ -31,16 +32,16 @@
 var Gensun = Gensun || {};
 Gensun.Cursor = Gensun.Cursor || {};
 
-  (function() {
+  (function($) {
 	  
 let param = PluginManager.parameters('Gensun_CursorBlink');
-Gensun.Cursor._duration = Number(param["Frames per cycle"]);
-Gensun.Cursor._opacityPeak = Number(param["Peak Opacity"]);
-Gensun.Cursor._opacityBase = Number(param["Base Opacity"]);
-Gensun.Cursor._rounding = Number(param["Rounding"]);
-Gensun.Cursor._opacityDifferential = Gensun.Cursor._opacityPeak - Gensun.Cursor._opacityBase;
+$._duration = Number(param["Frames per cycle"]);
+$._opacityPeak = Number(param["Peak Opacity"]);
+$._opacityBase = Number(param["Base Opacity"]);
+$._rounding = Number(param["Rounding"]);
+$._opacityDifferential = $._opacityPeak - $._opacityBase;
 
-Gensun.Cursor.power = (function(power) {
+$.power = (function(power) {
 	switch (power) {
 		case 1:		return function(blinkPhase) { return blinkPhase; };
 		case 2:		return function(blinkPhase) { return blinkPhase * blinkPhase; };
@@ -51,18 +52,18 @@ Gensun.Cursor.power = (function(power) {
 })(Number(param["Easing Power"]));
 
 Window.prototype.cursorOpacity = function() {
-	var blinkPhase = this._animationCount % Gensun.Cursor._duration;
-	blinkPhase = 2 * Math.abs(Gensun.Cursor._duration/2 - blinkPhase) / Gensun.Cursor._duration;
-	return Gensun.Cursor._opacityBase + Gensun.Cursor.power(blinkPhase) * Gensun.Cursor._opacityDifferential;
+	var blinkPhase = this._animationCount % $._duration;
+	blinkPhase = 2 * Math.abs($._duration/2 - blinkPhase) / $._duration;
+	return $._opacityBase + $.power(blinkPhase) * $._opacityDifferential;
 };
 
-if (Gensun.Cursor._rounding > 0) {
+if ($._rounding > 0) {
 	
-	const opacityFactor = 1 / Gensun.Cursor._rounding;
-	Gensun.Cursor.cursorOpacity = Window.prototype.cursorOpacity;
+	const opacityFactor = 1 / $._rounding;
+	$.cursorOpacity = Window.prototype.cursorOpacity;
 	Window.prototype.cursorOpacity = function() {
-		var opacity = Gensun.Cursor.cursorOpacity.call(this);
-		return Math.round(opacity * opacityFactor) * Gensun.Cursor._rounding;
+		var opacity = $.cursorOpacity.call(this);
+		return Math.round(opacity * opacityFactor) * $._rounding;
 	};
 	
 }
@@ -76,5 +77,5 @@ Window.prototype._updateCursor = function() {
     this._windowCursorSprite.visible = this.isOpen();
 };
 
-  })();
+  })(Gensun.Cursor);
   
