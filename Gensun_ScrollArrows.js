@@ -58,7 +58,6 @@ Window_Selectable.prototype.update = function() {
 
 Window_Selectable.prototype.getDisplacement = function() {
 	var phase = (this._arrowAnimCount++) % $._duration;
-	console.log(phase);
 	phase = 2 * Math.abs($._duration / 2 - phase) / $._duration;
 	return $._min + $.power(phase) * $._totalDistance;
 };
